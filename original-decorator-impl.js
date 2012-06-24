@@ -14,36 +14,49 @@ var Decorator, DemoDecorator, target;
  */
 Decorator = function(decoratedObject){
 	this.methodsBackup = {};
-	this.newMethods = {  // override this in extensions
-        'removeDecorator': this.removeDecorator
-    };
+	_.extend(this.newMethods, {  // override this in extensions
+        'removeDecorator': _.bind(this.removeDecorator, this, decoratedObject),
+        'overritenMethod': _.bind(this.overritenMethod, this)
+    });
 
 	for (decMethod in this.newMethods){
-		if (this.newMethods.hasOwnProperty(decMethod) && typeof(decMethod) == "function"){  // pass in methods, or I don't care about it
-			if (this[decMethod]) this.methodsBackup[decMethod] = this[decMethod];
-			this[decMethod] = this.newMethods[decMethod];
+		if (this.newMethods.hasOwnProperty(decMethod) && typeof(this.newMethods[decMethod]) == "function"){  // pass in methods, or I don't care about it
+			if (decoratedObject[decMethod]) this.methodsBackup[decMethod] = decoratedObject[decMethod];
+			decoratedObject[decMethod] = this.newMethods[decMethod];
 		}
 	}
+    
+    return decoratedObject;
 };
 Decorator.prototype = {
-	remove: function(){
+	removeDecorator: function(decoratedObject){
 		var decMethod;
 
-		for (decMethod in this.methodsBackup && this.methodsBackup.hasOwnProperty(decMethod)){
-			this[decMethod] = this.methodsBackup[decMethod];
+		for (decMethod in this.methodsBackup){
+            if (this.methodsBackup.hasOwnProperty(decMethod)){
+                decoratedObject[decMethod] = this.methodsBackup[decMethod];
+            }
 		}
-	}
+        
+        return decoratedObject;
+	},
+    
+    overritenMethod: function(methodName){
+        return this.methodsBackup[methodName];
+    }
 };
 
 
 /* Client code: */
-DemoDecorator = function(){
-    Decorator.apply(this, arguments);
+DemoDecorator = function(decoratedObject){
+    decoratedObject = Decorator.apply(this, arguments);
+    return decoratedObject;
 };
 DemoDecorator.prototype = _.extend({}, Decorator.prototype, {
 	newMethods: {
 		demo: function(){
-			return this.price() + " : decorated (DemoDecorator)";
+            var oldDemoFn = this.overritenMethod('demo');
+			return (oldDemoFn ? oldDemoFn() : '') + ' : decorated (DemoDecorator)';
 		}
 	}
 });
