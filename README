@@ -1,0 +1,6 @@
+Looking for an implementation of the Decorator design pattern, where you can stack up decorators on an object, and them remove them.
+I need to back up the method it might override, but only if it's on the instance itself, not on the prototype, because it doesn't matter if it's up the chain.
+
+The result, so far, is an over-complicated implementation, that lacks the elegance of the other solutions that I've seen so far. In
+fact, it's so complex that it entirely defeats the purpose of a design pattern. A design pattern implementation must be easy 
+enough to be remembered. I believe that a solution that's simpler and easier to memorize is possible.
