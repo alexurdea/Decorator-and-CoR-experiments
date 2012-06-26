@@ -1,6 +1,69 @@
-Looking for an implementation of the Decorator design pattern, where you can stack up decorators on an object, and them remove them.
-I need to back up the method it might override, but only if it's on the instance itself, not on the prototype, because it doesn't matter if it's up the chain.
+This is intended to be a (small) collection of implementations for the Decorator design pattern. It doesn't contain all possible approaches to 
+this pattern, just a bunch that I wanted to experiment with. Feel free to contribute to this repo.
 
-The result, so far, is an over-complicated implementation, that lacks the elegance of the other solutions that I've seen so far. In
-fact, it's so complex that it entirely defeats the purpose of a design pattern. A design pattern implementation must be easy 
-enough to be remembered. I believe that a solution that's simpler and easier to memorize is possible.
+Each file contains a different approach:
+
+  * decorator-add-remove-methods.js
+    -------------------------------
+   
+    I wanted to write a Decorator constructor that could be extended into other Decorator constructors which can then be stacked one on top of
+    the other, and possibly removed afterwards.
+    
+    I usually start with the API, and them move on to development. Here's how this is supposed to work:
+    
+        Let's say `DemoDecorator` and `DemoDecorator2` are extensions of the Decorator constructor. They define the methods that will enhance 
+        (possibly by overriding) an object called `target`. They can be stacked and unstacked off the object:
+        
+        ...
+        target = {
+            demo: function(){
+                return "not decorated";
+            }
+        };
+        
+        // client code:
+        DemoDecorator = function(decoratedObject){
+            decoratedObject = Decorator.apply(this, arguments);
+            return decoratedObject;
+        };
+        DemoDecorator.prototype = _.extend({}, Decorator.prototype, {
+            newMethods: {
+                demo: function(){
+                    var oldDemoFn = this.overriddenMethod('demo');
+                    return (oldDemoFn ? oldDemoFn() : '') + ' : decorated (DemoDecorator)';
+                }
+            }
+        });
+        
+        DemoDecorator2 = function(decoratedObject){
+            decoratedObject = Decorator.apply(this, arguments);
+            return decoratedObject;
+        };
+        DemoDecorator2.prototype = _.extend({}, Decorator.prototype, {
+            newMethods: {
+                demo: function(){
+                    var oldDemoFn = this.overriddenMethod('demo');
+                    return (oldDemoFn ? oldDemoFn() : '') + ' : decorated (DemoDecorator II)';
+                }
+            }
+        });
+        
+        // actual usage:
+        target = new DemoDecorator2(DemoDecorator(target));
+        
+        target.demo();
+        // => "not decorated : decorated (DemoDecorator) : decorated (DemoDecorator II) : decorated (DemoDecorator III)"
+        
+        target.removeDecorator().removeDecorator();
+        // => "not decorated"
+    
+    The thing I really dislike is that it's adding a bunch of utility methods on the decorated object (`removeDecorator`, `overriddenMethod`,
+    `decoratorScope`), thus violating a crucial principle: "don't modify objects you don't own". This is a big problem, because those 
+    methods might already exist, and might be used by other methods or client code. The only safeguard is the name of the methods - using 
+    something that's unlikely to be in use already, but this is still very risky.
+    
+    The result, so far, is an over-complicated implementation, that lacks the elegance of other Decorator solutions that I've seen so far.
+    In fact, this is more of a Decorator library, than a Decorator pattern approach. A design pattern implementation must be easy enough to 
+    remember.
+    
+  --------------------------------------------------------------------------------------------------------
