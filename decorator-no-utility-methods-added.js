@@ -2,7 +2,7 @@ var Decorator;
 
 /**
  * @class
- * Using a constructor, because I need a scope created per decorated instance.
+ * Attempting to decorate objects without placing utility methods on them.
  * 
  * @property {Object} newMethods Override this in extensions (on the prototype).
  *
@@ -31,7 +31,7 @@ Decorator = function(decoratedObject){
         'overriddenMethod': _.bind(this.overriddenMethod, this),
         'decoratorScope': _.bind(this.decoratorScope, this)
     });
-
+    
 	for (decMethod in this.newMethods){
 		if (this.newMethods.hasOwnProperty(decMethod) && typeof(this.newMethods[decMethod]) == "function"){
 			if (decoratedObject[decMethod]) {
@@ -50,6 +50,10 @@ Decorator = function(decoratedObject){
     return decoratedObject;
 };
 Decorator.prototype = {
+    /**
+     * @public
+     * @returns {Object} The original object, before decorating it.
+     */
 	removeDecorator: function(decoratedObject){
 		var decMethod;
 
@@ -62,10 +66,18 @@ Decorator.prototype = {
         return decoratedObject;
 	},
     
+    /**
+     * @public
+     * @returns {Function} The original method, before the object had been decorated. It will be bound to the right context.
+     */
     overriddenMethod: function(methodName){
         return this.methodsBackup[methodName];
     },
     
+    /**
+     * Utility method 
+     * @public
+     */
     decoratorScope: function(){
         return this;
     }
