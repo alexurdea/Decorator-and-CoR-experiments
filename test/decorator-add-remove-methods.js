@@ -12,11 +12,11 @@ module("Decorator-add-remove-methods", {
         targetClone = clone_object(target);
         
         /* Client code: */
-        DemoDecorator = function(decoratedObject){
-            decoratedObject = Decorator.apply(this, arguments);
-            return decoratedObject;
-        };
-        DemoDecorator.prototype = _.extend({}, Decorator.prototype, {
+        DemoDecorator = Decorator.extend({
+            constructor: function(decoratedObject){
+                decoratedObject = Decorator.apply(this, arguments);
+                return decoratedObject;
+            },
             newMethods: {
                 demo: function(){
                     var oldDemoFn = this.overriddenMethod('demo');

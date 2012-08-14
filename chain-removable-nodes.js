@@ -22,6 +22,7 @@ var ChainNode, ChainWithRemovableNodes;
 ChainNode = function(next){
     this.next = next || null;
 };
+ChainNode.extend = Extend.extendMethod;
 ChainNode.prototype = {
     /**
      * @param {ChainNode} next

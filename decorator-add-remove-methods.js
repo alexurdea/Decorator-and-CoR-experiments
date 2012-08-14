@@ -49,6 +49,7 @@ Decorator = function(decoratedObject){
     
     return decoratedObject;
 };
+Decorator.extend = Extend.extendMethod;
 Decorator.prototype = {
 	removeDecorator: function(decoratedObject){
 		var decMethod;

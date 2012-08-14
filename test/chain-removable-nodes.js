@@ -21,23 +21,26 @@ module("Chain-removable-nodes", {
         };
         
         /* Client code: */
-        DemoChainNode1 = function(){
-            ChainNode.apply(this, arguments);
-            this.process = _.bind(processFn, this, 1);
-        };
-        DemoChainNode1.prototype = _.extend({}, ChainNode.prototype);
+        DemoChainNode1 = ChainNode.extend({
+            constructor: function(){
+                ChainNode.apply(this, arguments);
+                this.process = _.bind(processFn, this, 1);
+            }
+        });
 
-        DemoChainNode2 = function(){
-            ChainNode.apply(this, arguments);
-            this.process = _.bind(processFn, this, 2);
-        };
-        DemoChainNode2.prototype = _.extend({}, ChainNode.prototype);
+        DemoChainNode2 = ChainNode.extend({
+            constructor: function(){
+                ChainNode.apply(this, arguments);
+                this.process = _.bind(processFn, this, 2);
+            }
+        });
 
-        DemoChainNode3 = function(){
-            ChainNode.apply(this, arguments);
-            this.process = _.bind(processFn, this, 3);
-        };
-        DemoChainNode3.prototype = _.extend({}, ChainNode.prototype);
+        DemoChainNode3 = ChainNode.extend({
+            constructor: function(){
+                ChainNode.apply(this, arguments);
+                this.process = _.bind(processFn, this, 3);
+            }
+        });
          
         demoChain = _.extend({}, ChainWithRemovableNodes, {
             process: function(){
