@@ -7,11 +7,12 @@ var Decorator;
  * @property {Object} newMethods Override this in extensions (on the prototype).
  *
  * @example
- * DemoDecorator = function(decoratedObject){
- *     decoratedObject = Decorator.apply(this, arguments);
- *     return decoratedObject;
- * };
- * DemoDecorator.prototype = _.extend({}, Decorator.prototype, {
+ * // Uses the Backbone JS extend mechanism
+ * DemoDecorator = Decorator.extend({
+ *     constructor: function(decoratedObject){
+ *         decoratedObject = Decorator.apply(this, arguments);
+ *         return decoratedObject;
+ *     },
  *     newMethods: {
  *         demo: function(){
  *             // you could get the version of the method you're overriding, and use it

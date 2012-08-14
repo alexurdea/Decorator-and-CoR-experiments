@@ -5,10 +5,11 @@ var ChainNode, ChainWithRemovableNodes;
  * @public {ChainNode} next
  *
  * @example
- * DemoChainNode1 = function(){
- *     ChainNode.apply(this, arguments);
- * };
- * DemoChainNode1.prototype = _.extend({}, ChainNode.prototype, {
+ * // Uses the Backbone JS extend mechanism
+ * DemoChainNode1 = ChainNode.extend({
+ *     constructor: function(){
+ *         ChainNode.apply(this, arguments);
+ *     },
  *     process: function(demoString){
  *         var s = (demoString ? demoString : "")  + "DemoChain #1 ";
  *         if (this.next && typeof this.next && typeof this.next.process == "function"){
