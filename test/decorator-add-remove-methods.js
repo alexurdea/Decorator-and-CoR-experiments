@@ -25,11 +25,11 @@ module("Decorator-add-remove-methods", {
             }
         });
 
-        DemoDecorator2 = function(decoratedObject){
-            decoratedObject = Decorator.apply(this, arguments);
-            return decoratedObject;
-        }
-        DemoDecorator2.prototype = _.extend({}, Decorator.prototype, {
+        DemoDecorator2 = Decorator.extend({
+            constructor: function(decoratedObject){
+                decoratedObject = Decorator.apply(this, arguments);
+                return decoratedObject;
+            },
             newMethods: {
                 demo: function(){
                     var oldDemoFn = this.overriddenMethod('demo');
@@ -38,11 +38,11 @@ module("Decorator-add-remove-methods", {
             }
         });
 
-        DemoDecorator3 = function(decoratedObject){
-            decoratedObject = Decorator.apply(this, arguments);
-            return decoratedObject;
-        }
-        DemoDecorator3.prototype = _.extend({}, Decorator.prototype, {
+        DemoDecorator3 = Decorator.extend({
+            constructor: function(decoratedObject){
+                decoratedObject = Decorator.apply(this, arguments);
+                return decoratedObject;
+            },
             newMethods: {
                 demo: function(){
                     var oldDemoFn = this.overriddenMethod('demo');
