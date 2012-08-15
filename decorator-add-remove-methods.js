@@ -54,16 +54,13 @@ Decorator.extend = Extend.extendMethod;
 Decorator.prototype = {
 	removeDecorator: function(decoratedObject){
 		var decMethod, method;
-// console.log(".............................");
+        
         for (method in decoratedObject){
-// console.log(method);
             if (decoratedObject.hasOwnProperty(method) && typeof decoratedObject[method] == "function"){
-// console.log(method);            
                 if (this.methodsBackup.hasOwnProperty(method)){
                     decoratedObject[method] = this.methodsBackup[method];
                 } else {
-                    delete decoratedObject.method;
-                    console.log(method);
+                    delete decoratedObject[method];
                 }
             }
         }

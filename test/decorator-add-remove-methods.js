@@ -76,7 +76,7 @@ test("Check the `demo` overritten method while decorating and undecorating targe
     equal(target.demo(), "not decorated : decorated (DemoDecorator) : decorated (DemoDecorator II) : decorated (DemoDecorator III)", "`demo` return value after DemoDecorator2 + DemoDecorator3");
     
     target.removeDecorator().removeDecorator();
-    equal(target.demo(), "not decorated : decorated (DemoDecorator)", "`demo` return value after REMOVING DemoDecorator3, DemoDecorator3");
+    equal(target.demo(), "not decorated : decorated (DemoDecorator)", "`demo` return value after REMOVING DemoDecorator3, DemoDecorator2");
     
     target.removeDecorator();
     equal(target.demo(), "not decorated", "`demo` return value after REMOVING DemoDecorator");
