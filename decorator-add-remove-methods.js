@@ -45,6 +45,7 @@ Decorator = function(decoratedObject){
                 }
             }
 			decoratedObject[decMethod] = this.newMethods[decMethod];
+            decoratedObject[decMethod].decoratedBy = this;  // useful when removing decorators
 		}
 	}
     
@@ -52,21 +53,77 @@ Decorator = function(decoratedObject){
 };
 Decorator.extend = Extend.extendMethod;
 Decorator.prototype = {
-	removeDecorator: function(decoratedObject){
-		var decMethod, method;
-        
-        for (method in decoratedObject){
-            if (decoratedObject.hasOwnProperty(method) && typeof decoratedObject[method] == "function"){
-                if (this.methodsBackup.hasOwnProperty(method)){
-                    decoratedObject[method] = this.methodsBackup[method];
-                } else {
-                    delete decoratedObject[method];
-                }
+    /**
+     * @param {Object} decoratedObject
+     * @param {Decorator} Decorator If this is not provided, it defaults to the outermost Dec
+     * @returns decoratedObject {Object} Return it, for chaining.
+     */
+	removeDecorator: function(decoratedObject, decoratorConstructor){
+		var nextDecoratorNewMethodName,
+            thisDecoratorInstance, thisDecorator,
+            nextDecorator, nextDecoratorInstance, afterNextDecorator, afterNextDecoratorInstance;
+
+        thisDecoratorInstance = this.decoratorScope();
+        thisDecorator = thisDecoratorInstance.constructor;
+
+        // default to the outmost decorator, if none provided
+        (decoratorConstructor instanceof Function) || (decoratorConstructor = thisDecorator);
+
+        if (decoratorConstructor == thisDecorator){
+            // if this is the decorator, than take it off
+            this._removeDecoratorMethods(this, decoratedObject);
+            this._restoreBackedUpMethods(decoratedObject);
+        } else {
+            // check to see if there's a next decorator, and if it's an instance of `decoratorConstructor`
+            nextDecoratorInstance = this.overriddenMethod('decoratorScope')();
+            nextDecorator = nextDecoratorInstance.constructor;
+            
+            if (nextDecorator == decoratorConstructor){
+                // take out the methods that were added by this decorator. A method was added if it's not backed up, but in newMethods.
+                this._removeDecoratorMethods(nextDecoratorInstance, decoratedObject);
+
+                thisDecoratorInstance.setBackedUpMethods(nextDecoratorInstance.getBackedUpMethods());
+
+            } else {
+                // move deeper
+                nextDecoratorInstance.removeDecorator(decoratedObject, decoratorConstructor);
             }
         }
-        
+
         return decoratedObject;
 	},
+
+    /**
+     * @param decoratorInstance {Decorator}
+     * @param decoratedObject {Object}
+     */
+    _removeDecoratorMethods: function(decoratorInstance, decoratedObject){
+        var decoratorMethodName, decorator;
+
+        decorator = decoratorInstance.constructor;
+
+        for (decoratorMethodName in decorator.prototype.newMethods){
+                    
+            if (!(decoratorInstance.overriddenMethod(decoratorMethodName)) 
+                && decoratedObject[decoratorMethodName].decoratedBy == decoratorInstance
+                && decorator.prototype.newMethods.hasOwnProperty(decoratorMethodName)
+                && typeof decorator.prototype.newMethods[decoratorMethodName] == "function"){
+                
+                delete decoratedObject[decoratorMethodName];
+            }
+        }
+    },
+
+    /**
+     * @param decoratedObject {Object}
+     */
+    _restoreBackedUpMethods: function(decoratedObject){
+        var methodName;
+
+        for (methodName in this.methodsBackup){
+            decoratedObject[methodName] = this.methodsBackup[methodName];
+        }
+    },
     
     overriddenMethod: function(methodName){
         return this.methodsBackup[methodName];
@@ -74,5 +131,19 @@ Decorator.prototype = {
     
     decoratorScope: function(){
         return this;
+    },
+
+    /**
+     * @param backedUpMethods {Object}
+     */
+    setBackedUpMethods: function(backedUpMethods){
+        this.methodsBackup = backedUpMethods;
+    },
+
+    /**
+     * @returns {Object} The methods that were backed up by this decorator instance.
+     */
+    getBackedUpMethods: function(){
+        return this.methodsBackup;
     }
-};
+};      
