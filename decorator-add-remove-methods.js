@@ -81,9 +81,7 @@ Decorator.prototype = {
             if (nextDecorator == decoratorConstructor){
                 // take out the methods that were added by this decorator. A method was added if it's not backed up, but in newMethods.
                 this._removeDecoratorMethods(nextDecoratorInstance, decoratedObject);
-
                 thisDecoratorInstance.setBackedUpMethods(nextDecoratorInstance.getBackedUpMethods());
-
             } else {
                 // move deeper
                 nextDecoratorInstance.removeDecorator(decoratedObject, decoratorConstructor);
@@ -102,15 +100,20 @@ Decorator.prototype = {
 
         decorator = decoratorInstance.constructor;
 
-        for (decoratorMethodName in decorator.prototype.newMethods){
-                    
+        for (decoratorMethodName in decorator.prototype.newMethods){            
             if (!(decoratorInstance.overriddenMethod(decoratorMethodName)) 
                 && decoratedObject[decoratorMethodName].decoratedBy == decoratorInstance
                 && decorator.prototype.newMethods.hasOwnProperty(decoratorMethodName)
                 && typeof decorator.prototype.newMethods[decoratorMethodName] == "function"){
-                
                 delete decoratedObject[decoratorMethodName];
             }
+        }
+
+        // if it's the innermost decorator, ditch the utility methods
+        if (!decoratedObject.overriddenMethod('decoratorScope')){
+            delete decoratedObject['overriddenMethod'];
+            delete decoratedObject['decoratorScope'];
+            delete decoratedObject['removeDecorator'];
         }
     },
 

@@ -197,7 +197,6 @@ test("The initial `demo` method is fine after decorating/undecorating, but the u
         && target.demoDecoratorSpecific4 == undefined
         && target.demoDecoratorSpecific5 == undefined, "No decorator specific methods present after completely un-decorating the target.");
 
-    console.log(target.decoratorScope());
     ok(target.removeDecorator == undefined
         && target.overriddenMethod == undefined
         && target.decoratorScope == undefined, "No utility methods left over.");
