@@ -34,7 +34,6 @@ module("Decorator-add-remove-methods", {
         DemoDecorator = Decorator.extend({
             constructor: function(decoratedObject){
                 decoratedObject = Decorator.apply(this, arguments);
-                "DemoDecorator";
                 return decoratedObject;
             },
             newMethods: {
@@ -68,7 +67,6 @@ module("Decorator-add-remove-methods", {
         DemoDecorator3 = Decorator.extend({
             constructor: function(decoratedObject){
                 decoratedObject = Decorator.apply(this, arguments);
-                "DemoDecorator3";
                 return decoratedObject;
             },
             newMethods: {
