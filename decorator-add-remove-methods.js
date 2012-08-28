@@ -2,8 +2,9 @@ var Decorator;
 
 /**
  * @class
- * Using a constructor, because I need a scope created per decorated instance.
- * 
+ * Instance will be used to store overridden methods. They will be bound before being
+ * archived.
+ *
  * @property {Object} newMethods Override this in extensions (on the prototype).
  *
  * @example
@@ -17,7 +18,7 @@ var Decorator;
  *         demo: function(){
  *             // you could get the version of the method you're overriding, and use it
  *             var oldDemoFn = this.overriddenMethod('demo');
- *             return (oldDemoFn ? oldDemoFn() : '') + ' : decorated (DemoDecorator)';
+ *             return (oldDemoFn ? oldDemoFn() : '') + ' is now decorated (DemoDecorator)';
  *         }
  *     }
  * });
@@ -55,19 +56,20 @@ Decorator.extend = Extend.extendMethod;
 Decorator.prototype = {
     /**
      * @param {Object} decoratedObject
-     * @param {Decorator} Decorator If this is not provided, it defaults to the outermost Dec
+     * @param {Decorator} decoratorConstructor If this is not provided, it defaults to the outermost decorator
      * @returns decoratedObject {Object} Return it, for chaining.
      */
 	removeDecorator: function(decoratedObject, decoratorConstructor){
-		var nextDecoratorNewMethodName,
-            thisDecoratorInstance, thisDecorator,
-            nextDecorator, nextDecoratorInstance, afterNextDecorator, afterNextDecoratorInstance;
+		var thisDecoratorInstance, thisDecorator,
+            nextDecorator, nextDecoratorInstance;
 
         thisDecoratorInstance = this.decoratorScope();
         thisDecorator = thisDecoratorInstance.constructor;
 
         // default to the outmost decorator, if none provided
-        (decoratorConstructor instanceof Function) || (decoratorConstructor = thisDecorator);
+        if (!(decoratorConstructor instanceof Function)){
+            decoratorConstructor = thisDecorator;
+        };
 
         if (decoratorConstructor == thisDecorator){
             // if this is the decorator, than take it off
@@ -128,10 +130,17 @@ Decorator.prototype = {
         }
     },
     
+    /**
+     * @param {String} methodName
+     * @returns {Function}
+     */
     overriddenMethod: function(methodName){
         return this.methodsBackup[methodName];
     },
     
+    /*
+     * @returns {Object}
+     */
     decoratorScope: function(){
         return this;
     },
